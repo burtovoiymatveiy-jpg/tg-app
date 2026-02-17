@@ -20,7 +20,6 @@
             display: flex; flex-direction: column; gap: 12px; transition: 0.3s;
         }
 
-        /* Скелетон */
         #skeleton { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; padding: 16px; box-sizing: border-box; }
         .sk-card { background: var(--sec-bg); height: 60px; border-radius: 16px; margin-bottom: 12px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
@@ -41,12 +40,11 @@
             color: var(--text); font-size: 16px; padding: 10px; width: 100%; box-sizing: border-box; outline: none;
         }
 
-        /* Анимированный чек без лишних отступов */
         .preview-box {
             background: var(--sec-bg); border: 1px dashed var(--hint); border-radius: 12px;
             padding: 12px; font-family: monospace; font-size: 12px; white-space: pre-line;
             max-height: 0; opacity: 0; overflow: hidden; transition: 0.4s ease-in-out;
-            margin: 0; /* Убрал отступы */
+            margin: 0;
         }
         .preview-box.show { max-height: 400px; opacity: 1; margin-bottom: 10px; border: 1px solid var(--accent); }
 
@@ -56,7 +54,6 @@
         
         .disclaimer { font-size: 10px; color: var(--hint); line-height: 1.3; text-align: center; margin-top: 8px; }
         .stats-box { text-align: center; border-top: 1px solid var(--card-border); padding-top: 12px; margin-top: 4px; }
-        .stats-num { color: var(--accent-green); font-weight: 900; font-size: 20px; }
     </style>
 </head>
 <body>
@@ -89,7 +86,7 @@
     </select>
     <div class="row" style="margin-top:10px">
         <div><label id="unit-label">Стр.</label><input type="number" id="count" placeholder="0" oninput="update()"></div>
-        <div><label>Дата (ДД.ММ)</label><input type="text" id="date" placeholder="12.05" maxlength="5" oninput="update()"></div>
+        <div><label>Дата (ДД.ММ)</label><input type="text" id="date" maxlength="5" oninput="update()"></div>
     </div>
 </div>
 
@@ -116,9 +113,8 @@
 </div>
 
 <div class="stats-box">
-    <div class="stats-num" id="posts-count">Загрузка...</div>
-    <div style="font-size:11px; color:var(--hint)">Довольных клиентов (равно числу постов в канале)</div>
-    <div style="font-size:10px; color:var(--accent); cursor:pointer; margin-top:2px;" onclick="tg.openTelegramLink('https://t.me/OTZblBblawarem')">t.me/OTZblBblawarem</div>
+    <div style="font-size:11px; color:var(--hint); margin-bottom: 4px;">Все отзывы о проделанной работе здесь:</div>
+    <div style="font-size:13px; color:var(--accent); font-weight: 700; cursor:pointer;" onclick="tg.openTelegramLink('https://t.me/OTZblBblawarem')">t.me/OTZblBblawarem</div>
 </div>
 
 <div class="disclaimer">
@@ -134,9 +130,14 @@
     // Скелетон
     setTimeout(() => document.getElementById('skeleton').style.display = 'none', 1000);
 
-    // Установка реального числа (можешь менять вручную здесь)
-    const currentReviews = 482; 
-    document.getElementById('posts-count').innerText = currentReviews;
+    // Установка текущей даты в placeholder
+    function setDatePlaceholder() {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        document.getElementById('date').placeholder = `${dd}.${mm}`;
+    }
+    setDatePlaceholder();
 
     function toggleTheme() {
         const isDark = document.body.getAttribute('data-theme') === 'dark';
@@ -158,12 +159,10 @@
         const details = document.getElementById('details').value || 'нет';
         const isUrgent = document.getElementById('urgent').checked;
 
-        // Маска даты
         let val = dateInput.value.replace(/\D/g, '');
         if (val.length > 2) val = val.substring(0, 2) + '.' + val.substring(2, 4);
         dateInput.value = val;
 
-        // Показ чека
         if (countInput.value && dateInput.value.length === 5 && priceInput.value) {
             document.getElementById('preview').classList.add('show');
         } else {
